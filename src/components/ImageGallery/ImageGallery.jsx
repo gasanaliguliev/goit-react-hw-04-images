@@ -5,7 +5,7 @@ const ImageGallery = ({ images, onItemClick }) => (
   <ul className="ImageGallery">
     {images.map((image) => (
       <ImageGalleryItem
-        key={image.id}
+        key={image.id} 
         image={image}
         onItemClick={() => onItemClick(image)}
       />
@@ -14,4 +14,5 @@ const ImageGallery = ({ images, onItemClick }) => (
 );
 
 export default ImageGallery;
+
 

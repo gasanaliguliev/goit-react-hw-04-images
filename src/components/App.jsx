@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
 import Searchbar from './Searchbar/Searchbar';
 import ImageGallery from './ImageGallery/ImageGallery';
 import Loader from './Loader/Loader';
 import Button from './Button/Button';
 import Modal from './Modal/Modal';
+import  fetchImages from './API/api'; 
 import './styles.css';
 
 const App = () => {
@@ -16,24 +16,18 @@ const App = () => {
   const [totalHits, setTotalHits] = useState(0);
   const [isLoading, setIsLoading] = useState(false);
 
-  useEffect(() => {
-    if (query !== '') {
-      fetchImages();
-    }
-  }, [query]);
+  const handleSearchSubmit = (newQuery) => {
+    setQuery(newQuery);
+    setImages([]);
+    setPage(1);
+  };
 
-  const fetchImages = () => {
-    setIsLoading(true);
-
-    const apiKey = '38971521-301f5cb08025e3967497dc80d';
-    axios
-      .get(
-        `https://pixabay.com/api/?key=${apiKey}&q=${query}&page=${page}&per_page=12`
-      )
+  const handleLoadMore = () => {
+    fetchImages(query, page + 1)
       .then((response) => {
         setImages((prevImages) => [...prevImages, ...response.data.hits]);
         setTotalHits(response.data.totalHits);
-        setPage((prevPage) => prevPage + 1);
+        setPage(page + 1);
       })
       .catch((error) => console.error(error))
       .finally(() => {
@@ -43,12 +37,6 @@ const App = () => {
           behavior: 'smooth',
         });
       });
-  };
-
-  const handleSearchSubmit = (newQuery) => {
-    setQuery(newQuery);
-    setImages([]);
-    setPage(1);
   };
 
   const handleImageClick = (clickedImage) => {
@@ -61,13 +49,28 @@ const App = () => {
     setShowModal(false);
   };
 
+  useEffect(() => {
+    if (query !== '') {
+      fetchImages(query, page)
+        .then((response) => {
+          setImages(response.data.hits);
+          setTotalHits(response.data.totalHits);
+          setPage(2);
+        })
+        .catch((error) => console.error(error))
+        .finally(() => {
+          setIsLoading(false);
+        });
+    }
+  }, [query, page]);
+
   return (
     <div className="App">
       <Searchbar onSubmit={handleSearchSubmit} />
       <ImageGallery images={images} onItemClick={handleImageClick} />
       {isLoading && <Loader />}
       {images.length > 0 && !isLoading && totalHits > images.length && (
-        <Button onClick={fetchImages} />
+        <Button onClick={handleLoadMore} />
       )}
       {showModal && (
         <Modal image={selectedImage} onClose={handleCloseModal} />
@@ -77,5 +80,8 @@ const App = () => {
 };
 
 export default App;
+
+
+
 
 
