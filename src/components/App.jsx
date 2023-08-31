@@ -17,7 +17,7 @@ const App = () => {
   const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
-    if (query) {
+    if (query !== '') {
       fetchImages();
     }
   }, [query]);
@@ -51,8 +51,8 @@ const App = () => {
     setPage(1);
   };
 
-  const handleImageClick = (selectedImage) => {
-    setSelectedImage(selectedImage);
+  const handleImageClick = (clickedImage) => {
+    setSelectedImage(clickedImage);
     setShowModal(true);
   };
 
@@ -77,3 +77,5 @@ const App = () => {
 };
 
 export default App;
+
+
