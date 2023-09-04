@@ -23,20 +23,7 @@ const App = () => {
   };
 
   const handleLoadMore = () => {
-    fetchImages(query, page + 1)
-      .then((response) => {
-        setImages((prevImages) => [...prevImages, ...response.data.hits]);
-        setTotalHits(response.data.totalHits);
-        setPage(page + 1);
-      })
-      .catch((error) => console.error(error))
-      .finally(() => {
-        setIsLoading(false);
-        window.scrollTo({
-          top: document.documentElement.scrollHeight,
-          behavior: 'smooth',
-        });
-      });
+      setPage(page + 1);
   };
 
   const handleImageClick = (clickedImage) => {
@@ -50,18 +37,20 @@ const App = () => {
   };
 
   useEffect(() => {
-    if (query !== '') {
-      fetchImages(query, page)
-        .then((response) => {
-          setImages(response.data.hits);
-          setTotalHits(response.data.totalHits);
-          setPage(2);
-        })
-        .catch((error) => console.error(error))
-        .finally(() => {
-          setIsLoading(false);
-        });
-    }
+    if(query === '') return;
+    const fetchData = async () => {
+      try{
+        const{ data } = await fetchImages(query, page);
+
+        setImages(prev => [...prev,...data.hits]);
+        setTotalHits(data.totalHits);
+      } catch (error) {} 
+      finally {
+          setIsLoading(false); 
+        }
+      };
+
+    fetchData();
   }, [query, page]);
 
   return (
